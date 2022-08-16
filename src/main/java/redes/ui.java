@@ -3,12 +3,15 @@ package redes;
 
 import org.jivesoftware.smack.SmackException;
 
+import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.PresenceBuilder;
 import org.jivesoftware.smack.roster.Roster;
 import  org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -19,6 +22,8 @@ import java.util.Scanner;
 
 public class ui {
     Roster roster;
+    ChatManager chatManager;
+    MultiUserChatManager GCManager;
     ui() throws SmackException.NotConnectedException, SmackException.NotLoggedInException, InterruptedException
     {
         roster = Roster.getInstanceFor(Main.sech.con);
@@ -30,6 +35,9 @@ public class ui {
             public void presenceChanged(Presence presence) { }
         });
         showRoster();
+
+        chatManager = ChatManager.getInstanceFor(Main.sech.con);
+        GCManager = MultiUserChatManager.getInstanceFor(Main.sech.con);
         Scanner scan = new Scanner(System.in);
         boolean running = true;
         String userInput;
@@ -59,6 +67,14 @@ public class ui {
                     break;
                 case"-r":
                     showRoster();
+                    break;
+                case "-c":
+                    try
+                    {
+                        EntityBareJid jid = JidCreate.entityBareFrom(args);
+                        direct_chat dm = direct_chat.getChat(jid, chatManager);
+                        dm.run();
+                    }catch (XmppStringprepException e) {print(args + " isn't a valid JID");}
                     break;
                 case"-radd":
                     try {
@@ -121,6 +137,7 @@ public class ui {
         print("Status changed!");
     }
 
+    //Enserio me cae mal lo verboso que es Java
     void print(Object a)
     {
         System.out.println(a);
