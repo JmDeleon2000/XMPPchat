@@ -1,5 +1,7 @@
 package redes;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.PresenceBuilder;
 import org.jivesoftware.smack.roster.Roster;
@@ -58,5 +60,14 @@ class session
                 .build();
         con.sendStanza(presence);
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
+    }
+
+    public void tryRemoveAccount() throws SmackException.NotConnectedException, InterruptedException
+    {
+        AccountManager acctManager = AccountManager.getInstance(con);
+        try {
+            acctManager.deleteAccount();
+        } catch (SmackException.NoResponseException e){System.out.println("Couldn't delete account");}
+        catch (XMPPException.XMPPErrorException e){System.out.println("Couldn't delete account");}
     }
 }

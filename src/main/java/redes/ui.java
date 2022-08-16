@@ -41,20 +41,23 @@ public class ui {
                     break;
                 case"-dc":
                     running = false;
+                    if(chat.sech.con != null)
+                        chat.sech.con.disconnect();
                     break;
                 case "-st":
                     print("Write your new status: ");
                     changeStatus(scan.nextLine());
                     break;
+                case "-rmacc":
+                    chat.sech.tryRemoveAccount();
+                    running = false;
+                    break;
                 default:
                     print("Usage error. Use -h for reference.");
                     break;
             }
-
-
         }
-        if(chat.sech.con != null)
-            chat.sech.con.disconnect();
+
     }
 
 
