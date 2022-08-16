@@ -8,6 +8,8 @@ import org.jivesoftware.smack.packet.MessageBuilder;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatException;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+
+
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Domainpart;
@@ -22,14 +24,13 @@ public class muc
     static  muc active;
     String RoomName = "";
     MultiUserChat chat;
-    EntityBareJid myJID;
+    Resourcepart myResourcePart;
     MUCListener listener;
-    static ArrayList<EntityBareJid> openJIDs = new ArrayList<EntityBareJid>();
+    static ArrayList<Resourcepart> openJIDs = new ArrayList<Resourcepart>();
     static ArrayList<muc> openChats = new ArrayList<muc>();
     private muc(EntityBareJid room, Resourcepart room_name, MultiUserChatManager manager) throws SmackException.NotConnectedException
     {
-
-
+        chat = manager.getMultiUserChat(room);
         try
         {
             chat.create(room_name).makeInstant();
@@ -41,9 +42,9 @@ public class muc
         catch (MultiUserChatException.MissingMucCreationAcknowledgeException e){}
         catch (MultiUserChatException.MucAlreadyJoinedException e)
         {
-            chat = manager.getMultiUserChat(room);
+           // chat = manager.getMultiUserChat(room);
         }
-        openJIDs.add(room);
+        openJIDs.add(room_name);
         openChats.add(this);
         RoomName = room_name.toString();
         listener = new MUCListener(this);
@@ -52,13 +53,13 @@ public class muc
 
     public static muc getMUC(String room_name, MultiUserChatManager manager) throws SmackException.NotConnectedException, XmppStringprepException
     {
-        Domainpart domainpart = Domainpart.from(Main.sech.domainName);
+        EntityBareJid room = JidCreate.entityBareFrom(room_name + "@" + Main.sech.domainName);
         Resourcepart resourcepart = Resourcepart.from(room_name);
-        EntityBareJid room = (EntityBareJid) JidCreate.domainFullFrom(domainpart, resourcepart);
-        if (openJIDs.contains(room))
+
+        if (openJIDs.contains(resourcepart))
         {
             for (muc chat : openChats)
-                if (chat.myJID == room)
+                if (chat.myResourcePart == resourcepart)
                     return chat;
         }
         return new muc(room, resourcepart, manager);
