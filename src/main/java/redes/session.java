@@ -1,6 +1,7 @@
 package redes;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.PresenceBuilder;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smackx.iqregister.AccountManager;
@@ -51,6 +52,9 @@ class session
             con.connect();
             con.login();
         }
-
+        Presence presence = PresenceBuilder.buildPresence()
+                .setMode(Presence.Mode.available)
+                .build();
+        con.sendStanza(presence);
     }
 }

@@ -1,4 +1,6 @@
 package redes;
+import org.jivesoftware.smack.SmackException;
+
 import java.util.Scanner;
 
 
@@ -22,7 +24,7 @@ public class chat {
         {
             System.out.println("Do you want have an account? (Y/N): ");
 
-            switch (scan.nextLine())
+            switch (scan.nextLine().toUpperCase())
             {
                 case "Y":
                     inband = false;
@@ -52,8 +54,12 @@ public class chat {
         }
 
         if (sech.con != null)
-            System.out.println("Connected succesfully");
-        ui myUI = new ui();
+            System.out.println("Connected successfully");
+        try {
+            ui myUI = new ui();
+        }
+        catch (SmackException.NotConnectedException e){System.out.println("Not yet connected");}
+        catch (SmackException.NotLoggedInException e){System.out.println("Not yet logged in");}
 
     }
 }
