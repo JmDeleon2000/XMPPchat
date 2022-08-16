@@ -4,7 +4,7 @@ import org.jivesoftware.smack.SmackException;
 import java.util.Scanner;
 
 
-public class chat {
+public class Main {
     static session sech;
     public static void main( String[] args )
     {

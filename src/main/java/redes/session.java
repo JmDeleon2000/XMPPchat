@@ -15,9 +15,11 @@ import org.jxmpp.jid.parts.Localpart;
 class session
 {
     public AbstractXMPPConnection con;
+    public String domainName;
 
     public session(String domain, String user, String pw, boolean inBandReg) throws Exception
     {
+        domainName = domain;
         if (inBandReg)
         {
             XMPPTCPConnectionConfiguration conConf =

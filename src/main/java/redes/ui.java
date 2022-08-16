@@ -7,6 +7,11 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.PresenceBuilder;
 import org.jivesoftware.smack.roster.Roster;
 import  org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterListener;
+import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 
 import java.util.Collection;
@@ -16,19 +21,35 @@ public class ui {
     Roster roster;
     ui() throws SmackException.NotConnectedException, SmackException.NotLoggedInException, InterruptedException
     {
+        roster = Roster.getInstanceFor(Main.sech.con);
+        //https://github.com/igniterealtime/Smack/blob/master/documentation/roster.md
+        roster.addRosterListener(new RosterListener() {
+            public void entriesAdded(Collection<Jid> addresses) {}
+            public void entriesDeleted(Collection<Jid> addresses) {}
+            public void entriesUpdated(Collection<Jid> addresses) {}
+            public void presenceChanged(Presence presence) { }
+        });
         showRoster();
         Scanner scan = new Scanner(System.in);
         boolean running = true;
         String userInput;
+        String args = "";
+        String command;
         while (running)
         {
+            System.out.print(Main.sech.domainName + ": ");
             userInput = scan.nextLine();
-            switch (userInput)
+            command = userInput.split(" ")[0];
+            if (command != userInput)
+                args = userInput.split(" ")[1];
+
+            switch (command)
             {
                 case "-h":
                     print("-h:\tDisplay this message");
                     print("-r:\tShow your roster");
                     print("-radd: [JID]\tAdd a user to your roster");
+                    print("-rdetail:\t");
                     print("-c: [JID]\tChat with a user");
                     print("-cg: new\tCreate a group chat");
                     print("-cg [Group chat name]\tJoin a group chat");
@@ -39,17 +60,24 @@ public class ui {
                 case"-r":
                     showRoster();
                     break;
+                case"-radd":
+                    try {
+                        BareJid jid = JidCreate.entityBareFrom(args);
+                        roster.sendSubscriptionRequest(jid);
+                        print("Subscription request sent successfully!");
+                    }catch (XmppStringprepException e) {print(args + " isn't a valid JID");}
+                    break;
                 case"-dc":
                     running = false;
-                    if(chat.sech.con != null)
-                        chat.sech.con.disconnect();
+                    if(Main.sech.con != null)
+                        Main.sech.con.disconnect();
                     break;
                 case "-st":
                     print("Write your new status: ");
                     changeStatus(scan.nextLine());
                     break;
                 case "-rmacc":
-                    chat.sech.tryRemoveAccount();
+                    Main.sech.tryRemoveAccount();
                     running = false;
                     break;
                 default:
@@ -63,7 +91,7 @@ public class ui {
 
     void showRoster() throws SmackException.NotConnectedException, SmackException.NotLoggedInException
     {
-        roster = Roster.getInstanceFor(chat.sech.con);
+
 
         if (!roster.isLoaded())
         {
@@ -89,7 +117,7 @@ public class ui {
                 .setMode(Presence.Mode.available)
                 .setStatus(status)
                 .build();
-        chat.sech.con.sendStanza(presence);
+        Main.sech.con.sendStanza(presence);
         print("Status changed!");
     }
 
