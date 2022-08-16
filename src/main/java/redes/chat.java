@@ -60,6 +60,7 @@ public class chat {
         }
         catch (SmackException.NotConnectedException e){System.out.println("Not yet connected");}
         catch (SmackException.NotLoggedInException e){System.out.println("Not yet logged in");}
+        catch (InterruptedException e) {System.out.println(e.getMessage());}
 
     }
 }

@@ -3,6 +3,8 @@ package redes;
 
 import org.jivesoftware.smack.SmackException;
 
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.PresenceBuilder;
 import org.jivesoftware.smack.roster.Roster;
 import  org.jivesoftware.smack.roster.RosterEntry;
 
@@ -12,7 +14,51 @@ import java.util.Scanner;
 
 public class ui {
     Roster roster;
-    ui() throws SmackException.NotConnectedException, SmackException.NotLoggedInException
+    ui() throws SmackException.NotConnectedException, SmackException.NotLoggedInException, InterruptedException
+    {
+        showRoster();
+        Scanner scan = new Scanner(System.in);
+        boolean running = true;
+        String userInput;
+        while (running)
+        {
+            userInput = scan.nextLine();
+            switch (userInput)
+            {
+                case "-h":
+                    print("-h:\tDisplay this message");
+                    print("-r:\tShow your roster");
+                    print("-radd: [JID]\tAdd a user to your roster");
+                    print("-c: [JID]\tChat with a user");
+                    print("-cg: new\tCreate a group chat");
+                    print("-cg [Group chat name]\tJoin a group chat");
+                    print("-dc:\tDisconnect (log out)");
+                    print("-rmacc:\tDeletes current account from the server");
+                    print("-st:\tChange status");
+                    break;
+                case"-r":
+                    showRoster();
+                    break;
+                case"-dc":
+                    running = false;
+                    break;
+                case "-st":
+                    print("Write your new status: ");
+                    changeStatus(scan.nextLine());
+                    break;
+                default:
+                    print("Usage error. Use -h for reference.");
+                    break;
+            }
+
+
+        }
+        if(chat.sech.con != null)
+            chat.sech.con.disconnect();
+    }
+
+
+    void showRoster() throws SmackException.NotConnectedException, SmackException.NotLoggedInException
     {
         roster = Roster.getInstanceFor(chat.sech.con);
 
@@ -32,37 +78,17 @@ public class ui {
                 System.out.println(entry);
             }
         }
-
-        Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        String userInput;
-        while (running)
-        {
-            userInput = scan.nextLine();
-            switch (userInput)
-            {
-                case "-h":
-                    print("-h:\tDisplay this message");
-                    print("-r:\tShow your roster");
-                    print("-c: [username]\tChat with a user");
-                    print("-cg: new\tCreate a group chat");
-                    print("-cg [Group chat name]\tJoin a group chat");
-                    print("-dc:\tDisconnect (log out)");
-                    print("-rmacc:\tDeletes current account from the server");
-                    print("-st:\tChange status");
-                    break;
-                default:
-                    print("Usage error. Use -h for reference.");
-                    break;
-            }
-
-
-        }
-        if(chat.sech.con != null)
-            chat.sech.con.disconnect();
     }
 
-
+    void changeStatus(String status) throws SmackException.NotConnectedException, InterruptedException
+    {
+        Presence presence = PresenceBuilder.buildPresence()
+                .setMode(Presence.Mode.available)
+                .setStatus(status)
+                .build();
+        chat.sech.con.sendStanza(presence);
+        print("Status changed!");
+    }
 
     void print(Object a)
     {
