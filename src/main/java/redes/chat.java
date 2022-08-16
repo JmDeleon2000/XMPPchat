@@ -1,0 +1,59 @@
+package redes;
+import java.util.Scanner;
+
+
+public class chat {
+    static session sech;
+    public static void main( String[] args )
+    {
+        Scanner scan = new Scanner(System.in);
+
+
+
+        System.out.println("Enter domain: ");
+        String domain = scan.nextLine();
+
+
+
+
+        boolean inband = true;
+        boolean invalid_input = true;
+        while (invalid_input)
+        {
+            System.out.println("Do you want have an account? (Y/N): ");
+
+            switch (scan.nextLine())
+            {
+                case "Y":
+                    inband = false;
+                    invalid_input = false;
+                    break;
+                case "N":
+                    invalid_input = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+
+        System.out.println("Enter username (not JID): ");
+        String user = scan.nextLine();
+
+        System.out.println("Enter your password: ");
+        String pw = scan.nextLine();
+        try{
+            sech = new session(domain, user, pw, inband);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        if (sech.con != null)
+            System.out.println("Connected succesfully");
+        ui myUI = new ui();
+
+    }
+}
