@@ -17,8 +17,8 @@ public class direct_chat implements  Runnable{
     EntityBareJid myJID;
     chatListener listener;
     static  direct_chat active;
-    static ArrayList<EntityBareJid> openJIDs;
-    static ArrayList<direct_chat> openChats;
+    static ArrayList<EntityBareJid> openJIDs = new ArrayList<EntityBareJid>();
+    static ArrayList<direct_chat> openChats = new ArrayList<direct_chat>();
 
     private direct_chat(EntityBareJid jid, ChatManager manager)
     {
@@ -28,6 +28,8 @@ public class direct_chat implements  Runnable{
         active = this;
         listener = new chatListener(this);
         manager.addIncomingListener(listener);
+        openJIDs.add(jid);
+        openChats.add(this);
     }
 
     public static direct_chat getChat(EntityBareJid jid, ChatManager manager)
