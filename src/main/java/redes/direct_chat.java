@@ -25,7 +25,6 @@ public class direct_chat implements  Runnable{
         dm_chat = manager.chatWith(jid);
         myJID = jid;
         chattingWith = jid.getLocalpart().asUnescapedString();
-        active = this;
         listener = new chatListener(this);
         manager.addIncomingListener(listener);
         openJIDs.add(jid);
@@ -43,15 +42,16 @@ public class direct_chat implements  Runnable{
     @Override
     public void run()
     {
-
+        active = this;
         Scanner scan = new Scanner(System.in);
         print("Type -q to quit current chat, -h for help. Any other input will be sent as messages.");
         print("--------------------------------" + chattingWith + "--------------------------------");
         String userInput;
         boolean running = true;
+        System.out.print(listener.msgQueue);
+        listener.msgQueue = "";
         while (running)
         {
-            System.out.print(listener.msgQueue);
 
             userInput = scan.nextLine();
 

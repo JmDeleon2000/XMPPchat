@@ -57,10 +57,9 @@ public class ui {
                     print("-h:\tDisplay this message");
                     print("-r:\tShow your roster");
                     print("-radd: [JID]\tAdd a user to your roster");
-                    print("-rdetail:\t");
+                    print("-rdetail:\tShow details about a user in your roster");
                     print("-c: [JID]\tChat with a user");
-                    print("-cg: new\tCreate a group chat");
-                    print("-cg [Group chat name]\tJoin a group chat");
+                    print("-cg [Group chat name]\tJoin a group chat (creates a new one if the specified room doesn't exist)");
                     print("-dc:\tDisconnect (log out)");
                     print("-rmacc:\tDeletes current account from the server");
                     print("-st:\tChange status");
@@ -78,9 +77,21 @@ public class ui {
                     break;
                 case"-radd":
                     try {
-                        BareJid jid = JidCreate.entityBareFrom(args);
+                        EntityBareJid jid = JidCreate.entityBareFrom(args);
                         roster.sendSubscriptionRequest(jid);
                         print("Subscription request sent successfully!");
+                    }catch (XmppStringprepException e) {print(args + " isn't a valid JID");}
+                    break;
+                case"-rdetail":
+                    try {
+                        EntityBareJid jid = JidCreate.entityBareFrom(args);
+                        showDetails(jid);
+                    }catch (XmppStringprepException e) {print(args + " isn't a valid JID");}
+                    break;
+                case "-gc":
+                    try {
+                        muc gc = muc.getMUC(args, GCManager);
+                        gc.enter();
                     }catch (XmppStringprepException e) {print(args + " isn't a valid JID");}
                     break;
                 case"-dc":
@@ -122,9 +133,24 @@ public class ui {
             print("Looks like your roster is empty!");
         else {
             for (RosterEntry entry : entries) {
-                System.out.println(entry);
+                print(entry);
             }
         }
+    }
+
+    void  showDetails(BareJid jid)
+    {
+        RosterEntry entry = roster.getEntry(jid);
+
+        print(entry);
+        print("Subscription approved: " + entry.isApproved());
+        print("Can see their presence: " + entry.canSeeHisPresence());
+        print("Can see your presence: " + entry.canSeeMyPresence());
+        //print("Groups: " + entry.getGroups());
+        Presence presence = roster.getPresence(jid);
+        print("Is available: " + presence.isAvailable());
+        print("Status: " + presence.getStatus());
+
     }
 
     void changeStatus(String status) throws SmackException.NotConnectedException, InterruptedException
